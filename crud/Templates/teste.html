@@ -14,16 +14,19 @@
 	<body>
 		<h1>Lista de Resgistro</h1>
 		<hr>
-		<table border="2">
-			<tr>
-				<td>ID</td>
-				<td>Nome</td>
-				<td>Empresa</td>
-				<td>Telefone</td>
-				<td>E-mail</td>
-				<td>Excluir</td>
-				<td>Editar</td>
-			</tr>
+		<div class="table-responsive">
+		<table class="table table-bordered">
+			<thead class="thead-inverse">
+				<tr>
+					<th>ID</th>
+					<th>Nome</th>
+					<th>Empresa</th>
+					<th>Telefone</th>
+					<th>E-mail</th>
+					<th>Excluir</th>
+					<th>Editar</th>
+				</tr>
+			</thead>
 			{% for registro in registros %}
 			<tr>
 				<td>{{ registro._id }}</td>
@@ -36,7 +39,8 @@
 			</tr>
 			{% endfor %}
 		</table><br>
-		<a href="/home">Voltar</a>
+		</div>
+		<button type="button" class="btn btn-default"><a href="{{ url_for('home')}}">Sair</a></button> <br>
 
 	</body>
 </html>

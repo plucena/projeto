@@ -22,7 +22,7 @@
 
   <div class="container">
   <h2 class="text-center" id="cor">Área de Login</h2>
-  <form class="form-horizontal" action="login" method="POST">
+  <form class="form-horizontal" action="loginAdm" method="POST">
     <div class="form-group">
 
       <label class="control-label col-sm-4" for="username" id="cor">E-mail da Empresa:</label>
@@ -38,13 +38,6 @@
       {{ erro }}
     </div>
     
-    <div class="form-group">
-      <div class="col-sm-offset-4 col-sm-10">
-        <div class="checkbox">
-          <a href="{{ url_for('registro')}}" style="color: gray">Registrar-se</a> 
-        </div>
-      </div>
-    </div>
     <div class="form-group">
       <div class="col-sm-offset-4 col-sm-10">
         <button type="submit" class="btn btn-default">Entrar</button>
