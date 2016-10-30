@@ -43,10 +43,11 @@ class Registro(db.Model):
 	endereco = db.Column(db.String)
 	telefone = db.Column(db.String)
 	email = db.Column(db.String)
-	password = db.Column(db.String) 
+	password = db.Column(db.String)
+	person = db.Column(db.String) 
 	
 
-	def __init__(self, nome, empresa, cep, endereco, telefone, email, password):
+	def __init__(self, nome, empresa, cep, endereco, telefone, email, password, person):
 		self.nome = nome
 		self.empresa = empresa
 		self.cep = cep
@@ -54,6 +55,7 @@ class Registro(db.Model):
 		self.telefone = telefone
 		self.email = email
 		self.password = password
+		self.person = person
 
 class Ideia(db.Model):
 	__tablename__='ideia'
@@ -77,6 +79,10 @@ db.create_all()
 def home():
 	return render_template('home.html')
 
+@app.route("/homeAdm")
+def homeAdm():
+	return render_template('homeAdm.html')
+
 @app.route("/index")
 def index():
 	return render_template('index.html')
@@ -88,6 +94,14 @@ def cadastrar():
 @app.route("/registro")
 def registro():
 	return render_template('registrar.html')
+
+@app.route("/telaAdm", methods=['GET', 'POST'])
+def telaAdm():
+	try:
+		if session['logged_in'] == True:
+			return render_template('telaAdm.html')
+	except (KeyError):		
+		return redirect(url_for("homeAdm"))
 
 @app.route("/telaPrincipal", methods=['GET', 'POST'])
 def telaPrincipal():
@@ -111,27 +125,43 @@ def cadastrarideia():
 def cadastro():
 	if request.method == "POST":
 		nome = request.form.get("nome")
-		telefone =  request.form.get("telefone")
-		cpf = request.form.get("cpf")
+		empresa = request.form.get("empresa")
+		cep = request.form.get("cep")
+		endereco = request.form.get("endereco")
+		telefone =  request.form.get("telefone")		
 		email = request.form.get("email")
-		senha = request.form.get("senha")
+		password = request.form.get("password")
+		person = 1
 
-		if nome and telefone and cpf and email and senha:
-			p = Pessoa(nome, telefone, cpf, email, senha)
+		if nome and empresa and cep and endereco and telefone and email and password and person:
+			p = Registro(nome, empresa, cep, endereco, telefone, email, password, person)
 			db.session.add(p)
 			db.session.commit()
 
-	return redirect(url_for("index"))
+	return redirect(url_for("cadastrar"))
 
 @app.route("/lista")
 def lista():
 	pessoas = Pessoa.query.all()
 	return render_template("lista.html", pessoas=pessoas)
 
+@app.route("/ideiasteste")
+def ideiasteste():
+	ideias = Ideia.query.all()
+	return render_template("ideiasteste.html", ideias=ideias)
+
 @app.route("/teste")
 def teste():
 	registros = Registro.query.all()
 	return render_template("teste.html", registros=registros)
+
+@app.route("/excluirideia/<int:id>")
+def excluirideia(id):
+	ide = Ideia.query.filter_by(_id=id).first()
+	db.session.delete(ide)
+	db.session.commit()
+	idei = Ideia.query.all()
+	return render_template("ideiasteste.html", idei=idei)
 
 @app.route("/excluir/<int:id>")
 def excluir(id):
@@ -140,6 +170,30 @@ def excluir(id):
 	db.session.commit()
 	pessoas = Registro.query.all()
 	return render_template("teste.html", pessoas=pessoas)
+
+@app.route("/atualizarideia/<int:id>", methods=['GET', 'POST'])
+def atualizarideia(id):
+	ide = Ideia.query.filter_by(_id=id).first()
+	
+	if request.method == "POST":
+		nomefun = request.form.get("nomefun")
+		area = request.form.get("area")
+		ideapara = request.form.get("ideiapara")
+		tipo = request.form.get("tipo")
+		ideia = request.form.get("ideia")
+		
+		if nomefun and area and ideiapara and tipo and ideia:
+			ide.nomefun = nomefun
+			ide.area = area
+			ide.ideiapara = ideiapara
+			ide.tipo = tipo
+			ide.ideia = ideia
+			
+			db.session.commit()
+
+			return redirect(url_for("ideiasteste"))
+
+	return render_template("atualizarideia.html", ide=ide)	
 
 @app.route("/atualizar/<int:id>", methods=['GET', 'POST'])
 def atualizar(id):
@@ -167,6 +221,32 @@ def atualizar(id):
 
 	return render_template("atualizar.html", pessoa=pessoa)
 
+@app.route("/loginAdm", methods=['GET', 'POST'])
+def loginAdm():
+	error = None
+	if request.method == 'POST':
+		try:
+			femail = request.form["username"]
+			fsenha  = request.form["password"]
+			pessoa = Registro.query.filter_by(email=femail).first()
+			teste = 1
+			
+			
+			if pessoa.password !=  fsenha and pessoa.person != teste:
+				error = 'Login invalido. Por favor, tente novamente.'
+				return render_template("homeAdm.html", erro=error)
+			else:
+				session['logged_in'] = True
+				flash('Você está logado!')
+				return redirect(url_for('telaAdm'))
+
+		except:		
+			error = 'Login invalido. Por favor, tente novamente.'
+			return render_template("homeAdm.html", erro=error)
+
+		
+		
+	return render_template('telaPrincipal.html', error=error)
 
 @app.route("/login", methods=['GET', 'POST'])
 def login():
@@ -177,9 +257,15 @@ def login():
 			fsenha  = request.form["password"]
 			pessoa = Registro.query.filter_by(email=femail).first()
 			
+			
 			if pessoa.password !=  fsenha:
 				error = 'Login invalido. Por favor, tente novamente.'
-				return redirect(url_for('home'))
+				return render_template("home.html", erro=error)
+			
+			elif pessoa.person != 1:
+				session['logged_in'] = True
+				flash('Você está logado!')
+				return redirect(url_for('telaAdm'))
 			else:
 				session['logged_in'] = True
 				flash('Você está logado!')
@@ -195,11 +281,11 @@ def login():
 
 @app.route("/registrar", methods=['GET', 'POST'])
 def registrar():
+	person = 2
 	if request.method == "POST":
-		reg = Registro(request.form['nome'], request.form['empresa'], request.form['cep'], request.form['endereco'], request.form['telefone'], request.form['email'], request.form['password'])
+		reg = Registro(request.form['nome'], request.form['empresa'], request.form['cep'], request.form['endereco'], request.form['telefone'], request.form['email'], request.form['password'], person)
 		db.session.add(reg)
 		db.session.commit()
-
 	return redirect(url_for('home'))
 
 @app.route("/sair/<int:id>", methods=['GET', 'POST'])
@@ -208,7 +294,6 @@ def sair(id):
 	flash('Você está deslogado!')
 	return redirect(url_for('home'))
 
-
 if __name__ == '__main__':
-	app.run(host="0.0.0.0", port=80)
-	   
+	app.run(debug=True)
+	#app.run(host="0.0.0.0", port=80)
