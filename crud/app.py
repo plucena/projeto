@@ -296,4 +296,5 @@ def sair(id):
 
 if __name__ == '__main__':
 	#app.run(debug=True)
-	app.run(host="0.0.0.0", port=80)
+	porta = int(os.getenv('VCAP_APP_PORT', 8080))
+	app.run(host="0.0.0.0", port=porta)
