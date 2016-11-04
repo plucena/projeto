@@ -79,6 +79,12 @@ class Ideia(db.Model):
 		
 db.create_all()
 
+
+@app.route('/')
+def hello_world():
+    return 'Hello World! I am running on port ' + str(port)
+
+
 @app.route("/home")
 def home():
 	return render_template('home.html')
