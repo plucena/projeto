@@ -82,7 +82,7 @@ db.create_all()
 
 @app.route('/')
 def hello_world():
-    return 'Hello World! I am running on port ' + str(port)
+    return 'Hello World! I am running on port ' 
 
 
 @app.route("/home")
