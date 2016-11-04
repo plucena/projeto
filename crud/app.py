@@ -2,10 +2,14 @@
 from flask import Flask, render_template, request, url_for, redirect, session, flash
 from flask.ext.sqlalchemy import SQLAlchemy
 import sys
+import cf_deployment_tracker
+
 #from flask.ext.login import LoginManager
 #from flask.ext.openid import OpenID
 #from config import basedir
-#import os
+import os
+
+cf_deployment_tracker.track()
 
 #lm = LoginManager()
 #lm.init_app(app)
