@@ -84,7 +84,6 @@ db.create_all()
 def hello_world():
     return 'Hello World! I am running on port ' 
 
-
 @app.route("/home")
 def home():
 	return render_template('home.html')
@@ -99,7 +98,7 @@ def cadastrar():
 
 @app.route("/registro")
 def registro():
-	return render_template('registrar.html')
+	return render_template('registro.html')
 
 @app.route("/telaPrincipal", methods=['GET', 'POST'])
 def telaPrincipal():
