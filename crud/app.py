@@ -89,10 +89,6 @@ def hello_world():
 def home():
 	return render_template('home.html')
 
-@app.route("/homeAdm")
-def homeAdm():
-	return render_template('homeAdm.html')
-
 @app.route("/index")
 def index():
 	return render_template('index.html')
@@ -104,14 +100,6 @@ def cadastrar():
 @app.route("/registro")
 def registro():
 	return render_template('registrar.html')
-
-@app.route("/telaAdm", methods=['GET', 'POST'])
-def telaAdm():
-	try:
-		if session['logged_in'] == True:
-			return render_template('telaAdm.html')
-	except (KeyError):		
-		return redirect(url_for("homeAdm"))
 
 @app.route("/telaPrincipal", methods=['GET', 'POST'])
 def telaPrincipal():
@@ -157,12 +145,16 @@ def lista():
 
 @app.route("/ideiasteste")
 def ideiasteste():
-	ideias = Ideia.query.all()
-	return render_template("ideiasteste.html", ideias=ideias)
+	try:
+		if session['logged_in'] == True:
+			ideias = Ideia.query.all()
+			return render_template("ideiasteste.html", ideias=ideias)
+	except (KeyError):		
+		return redirect(url_for("home"))
 
 @app.route("/teste")
 def teste():
-	registros = Registro.query.all()
+	registros = Registro(nome, empresa, telefone, email)
 	return render_template("teste.html", registros=registros)
 
 @app.route("/excluirideia/<int:id>")
@@ -231,33 +223,6 @@ def atualizar(id):
 
 	return render_template("atualizar.html", pessoa=pessoa)
 
-@app.route("/loginAdm", methods=['GET', 'POST'])
-def loginAdm():
-	error = None
-	if request.method == 'POST':
-		try:
-			femail = request.form["username"]
-			fsenha  = request.form["password"]
-			pessoa = Registro.query.filter_by(email=femail).first()
-			teste = 1
-			
-			
-			if pessoa.password !=  fsenha and pessoa.person != teste:
-				error = 'Login invalido. Por favor, tente novamente.'
-				return render_template("homeAdm.html", erro=error)
-			else:
-				session['logged_in'] = True
-				flash('Você está logado!')
-				return redirect(url_for('telaAdm'))
-
-		except:		
-			error = 'Login invalido. Por favor, tente novamente.'
-			return render_template("homeAdm.html", erro=error)
-
-		
-		
-	return render_template('telaPrincipal.html', error=error)
-
 @app.route("/login", methods=['GET', 'POST'])
 def login():
 	error = None
@@ -272,31 +237,41 @@ def login():
 				error = 'Login invalido. Por favor, tente novamente.'
 				return render_template("home.html", erro=error)
 			
-			elif pessoa.person != 1:
+			elif pessoa.person == 1:
+				#pessoa.authenticated = True
 				session['logged_in'] = True
 				flash('Você está logado!')
-				return redirect(url_for('telaAdm'))
+				#login_user(pessoa, remember=True)
+				return redirect(url_for('ideiasteste'))
 			else:
+				#pessoa.authenticated = True
 				session['logged_in'] = True
 				flash('Você está logado!')
+				#login_user(pessoa, remember=True)
 				return redirect(url_for('telaPrincipal'))
 
 		except:		
 			error = 'Login invalido. Por favor, tente novamente.'
 			return render_template("home.html", erro=error)
 
-		
-		
-	return render_template('telaPrincipal.html', error=error)
-
 @app.route("/registrar", methods=['GET', 'POST'])
 def registrar():
-	person = 2
 	if request.method == "POST":
-		reg = Registro(request.form['nome'], request.form['empresa'], request.form['cep'], request.form['endereco'], request.form['telefone'], request.form['email'], request.form['password'], person)
-		db.session.add(reg)
-		db.session.commit()
-	return redirect(url_for('home'))
+		nome = request.form.get("nome")
+		empresa = request.form.get("empresa")
+		cep = request.form.get("cep")
+		endereco = request.form.get("endereco")
+		telefone =  request.form.get("telefone")		
+		email = request.form.get("email")
+		password = request.form.get("password")
+		person = 2
+
+		if nome and empresa and cep and endereco and telefone and email and password and person:
+			p = Registro(nome, empresa, cep, endereco, telefone, email, password, person)
+			db.session.add(p)
+			db.session.commit()
+		
+	return redirect(url_for('teste'))
 
 @app.route("/sair/<int:id>", methods=['GET', 'POST'])
 def sair(id):

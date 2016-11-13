@@ -1,10 +1,16 @@
 function validar_ideia(){
+var nomefun = document.getElementById("nomefun").value;
 var area = document.getElementById("area").value;
 var ideiapara = document.getElementById("ideiapara").value;
 var tipo = document.getElementById("tipo").value;
 var ideia = document.getElementById("ideia").value;
-
 var erro = false;
+
+if(nomefun === ""){
+	document.getElementById("nomefun").style.boxShadow="1px 1px 1px 1px #ff4040";
+	document.getElementById("nomefun").style.color="#ff4040";
+	erro=true;
+}
 if(area === "1"){
 	document.getElementById("area").style.boxShadow="1px 1px 1px 1px #ff4040";
 	document.getElementById("area").style.color="#ff4040";
@@ -51,7 +57,7 @@ function validar_registro(){
 	var endereco = document.getElementById("endereco").value;
 	var telefone = document.getElementById("telefone").value;
 	var email = document.getElementById("email").value;
-	var passworrd = document.getElementById("password").value;
+	var password = document.getElementById("password").value;
 	var erro = false;
 
 	if(nome === ""){
@@ -84,12 +90,15 @@ function validar_registro(){
 		document.getElementById("email").style.color="#ff4040";
 		erro=true;
 	}
-	if(passworrd === ""){
+	if(password === ""){
 		document.getElementById("password").style.boxShadow="1px 1px 1px 1px #ff4040";
 		document.getElementById("password").style.color="#ff4040";
 		erro=true;
 	}
 	if(erro==true){
 	alert("Preencha os campos destacados");
-}
+	}
+	else{
+	document.getElementById("registro").submit();
+	}
 }
