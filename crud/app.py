@@ -81,8 +81,8 @@ db.create_all()
 
 
 @app.route('/')
-def hello_world():
-    return 'Hello World! I am running on port ' 
+def homeredirect():
+    return redirect(url_for("home"))
 
 @app.route("/home")
 def home():
